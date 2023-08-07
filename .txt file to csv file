@@ -1,0 +1,96 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+
+with open('/content/drive/MyDrive/Colab Notebooks/3. Bitter/Bitter txt.txt', 'r') as file:
+    lines = file.readlines()
+
+# Initialize variables to store data
+data = []
+current_entry = {}
+fields = ['Serial', 'Length', 'Sequence', 'ptm', 'plddt']
+
+# Process the data and extract relevant information
+for line in lines:
+    line = line.strip()
+    if line.startswith(fields[0]):
+        current_entry = {}
+    else:
+        parts = line.split(':', 1)  # Split only on the first colon
+        if len(parts) == 2:
+            field, value = parts
+            current_entry[field] = value.strip()
+            if field == 'plddt':
+                data.append(current_entry)
+
+# Write the processed data to a CSV file
+import csv
+
+csv_filename = 'processed_data.csv'
+with open(csv_filename, 'w', newline='') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=fields)
+    writer.writeheader()
+    writer.writerows(data)
+
+print(f"Processed data saved to {csv_filename}")
+
+
+from google.colab import files
+files.download('processed_data.csv')
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the CSV data into a pandas DataFrame
+data = pd.read_csv('processed_data.csv')
+
+# Create a scatter plot
+plt.figure(figsize=(10, 6))
+plt.scatter(data['Length'], data['plddt'], alpha=0.5)
+plt.xlabel('Sequence Length')
+plt.ylabel('PLDDT Score')
+plt.title('Sequence Length vs. PLDDT Score')
+plt.grid(True)
+
+# Save the plot as an image
+plt.savefig('scatter_plot.png')
+
+# Show the plot
+plt.show()
+
+
+
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the CSV data into a pandas DataFrame
+data = pd.read_csv('processed_data.csv')
+
+# Create a histogram for sequence length
+plt.figure(figsize=(10, 6))
+plt.hist(data['Length'], bins=20, color='blue', edgecolor='black')
+plt.xlabel('Sequence Length')
+plt.ylabel('Frequency')
+plt.title('Distribution of Sequence Length')
+plt.grid(True)
+
+# Save the plot as an image
+plt.savefig('distribution_of_seq_length_histogram.png')
+
+plt.show()
+
+# Create a histogram for PLDDT score
+plt.figure(figsize=(10, 6))
+plt.hist(data['plddt'], bins=20, color='green', edgecolor='black')
+plt.xlabel('PLDDT Score')
+plt.ylabel('Frequency')
+plt.title('Distribution of PLDDT Scores')
+plt.grid(True)
+# Save the plot as an image
+plt.savefig('distribution_of_PLDDT_score_histogram.png')
+
+plt.show()
+
+
